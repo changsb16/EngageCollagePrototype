@@ -232,13 +232,46 @@ export default function EngageImageCollage({
               const showOverlay = visibleIndex === overlayOnIndex;
 
               return (
-                <Tile
+                <div
                   key={it.id}
-                  item={it}
-                  // This makes your Secondary Ratio dropdown actually change tile shapes
-                  aspectRatio={arFromItem(it, SECONDARY_PORTRAIT_AR)}
-                  overlayText={showOverlay ? overlayText : undefined}
-                />
+                  style={{
+                    flex: "1 1 0",
+                    minHeight: 0,
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  <img
+                    src={it.src}
+                    alt={it.alt || ""}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: "center",
+                      display: "block",
+                    }}
+                    draggable={false}
+                  />
+                  {showOverlay && overlayText ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.45)",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 32,
+                        fontWeight: 700,
+                        letterSpacing: 0.2,
+                      }}
+                    >
+                      {overlayText}
+                    </div>
+                  ) : null}
+                </div>
               );
             })}
           </div>
