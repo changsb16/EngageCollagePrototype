@@ -164,7 +164,6 @@ export default function EngageImageCollage({
   // ====== PORTRAIT HERO: hero left, images stacked right ======
   if (heroIsPortrait) {
     const rightStack = secondary.slice(0, Math.min(3, secondaryCount));
-    const isThreeImagePortrait = visible.length === 3;
 
     return (
       <div style={wrapperStyle}>
@@ -223,9 +222,9 @@ export default function EngageImageCollage({
             style={{
               flex: "1 1 auto",
               minWidth: 0,
-              display: "grid",
+              display: "flex",
+              flexDirection: "column",
               gap: gapPx,
-              gridTemplateRows: isThreeImagePortrait ? "1fr 1fr" : "repeat(3, 1fr)",
             }}
           >
             {rightStack.map((it, idx) => {
