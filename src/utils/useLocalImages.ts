@@ -54,16 +54,17 @@ export function useLocalImages() {
         });
 
         // Load each image to get dimensions
-        const loadPromises = publicPaths.map(async (src, index) => {
+        const loadPromises = publicPaths.map(async (src, index): Promise<MediaItem | null> => {
           try {
             const dimensions = await loadImageDimensions(src);
-            return {
+            const item: MediaItem = {
               id: `local-${index + 1}`,
               src,
               width: dimensions.width,
               height: dimensions.height,
               alt: `Local image ${index + 1}`,
             };
+            return item;
           } catch (err) {
             console.error(`Failed to load image: ${src}`, err);
             return null;
