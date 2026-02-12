@@ -114,7 +114,7 @@ export default function App() {
   const [secondaryRatio, setSecondaryRatio] = useState<RatioKey>("4:3");
 
   // Photo set controls
-  const [photoSet, setPhotoSet] = useState<PhotoSetKey>("people");
+  const [photoSet, setPhotoSet] = useState<PhotoSetKey>("local");
   const [photoOffset, setPhotoOffset] = useState<number>(0);
 
   // Load local images dynamically
@@ -126,9 +126,12 @@ export default function App() {
     setPhotoOffset(0);
   };
 
-  // Rotate to next set of photos
+  // Rotate to random set of photos
   const handleRotatePhotos = () => {
-    setPhotoOffset((prev) => prev + 1);
+    const maxOffset = photoSet === "local"
+      ? localImageItems.length
+      : Math.max(PHOTO_SETS[photoSet].hero.length, PHOTO_SETS[photoSet].secondary.length);
+    setPhotoOffset(Math.floor(Math.random() * maxOffset));
   };
 
   const heroPreset = RATIO_PRESETS[heroRatio];
