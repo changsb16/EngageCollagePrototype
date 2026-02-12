@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import EngagePostCard from "./components/EngagePostCard";
 import type { MediaItem } from "./components/EngageImageCollage";
+import { useLocalImages } from "./utils/useLocalImages";
 
 type RatioKey = "16:9" | "3:2" | "4:3" | "1:1" | "4:5" | "3:4" | "9:16";
 
@@ -25,7 +26,7 @@ const SCENARIOS: Array<{ key: ScenarioKey; label: string; count: number }> = [
   { key: "missing-metadata", label: "Missing metadata (no width/height)", count: 5 },
 ];
 
-type PhotoSetKey = "people" | "mixed";
+type PhotoSetKey = "people" | "mixed" | "local";
 
 const PHOTO_SETS: Record<
   PhotoSetKey,
@@ -80,6 +81,11 @@ const PHOTO_SETS: Record<
       "photo-1523413651479-597eb2da0ad6",
     ],
   },
+  local: {
+    label: "Local photos (public/photos)",
+    hero: [], // Not used - images loaded dynamically via useLocalImages
+    secondary: [], // Not used - images loaded dynamically via useLocalImages
+  },
 };
 
 function makeUnsplashItem(
@@ -110,6 +116,9 @@ export default function App() {
   // Photo set controls
   const [photoSet, setPhotoSet] = useState<PhotoSetKey>("people");
 
+  // Load local images dynamically
+  const { items: localImageItems, isLoading: localImagesLoading, error: localImagesError } = useLocalImages();
+
   const heroPreset = RATIO_PRESETS[heroRatio];
   const secondaryPreset = RATIO_PRESETS[secondaryRatio];
 
@@ -119,6 +128,16 @@ export default function App() {
   }, [scenario]);
 
   const mediaItems: MediaItem[] = useMemo(() => {
+    // Special handling for local images
+    if (photoSet === "local") {
+      if (localImageItems.length === 0) {
+        return [];
+      }
+      // Return the requested number of images from the local set
+      return localImageItems.slice(0, scenarioCount);
+    }
+
+    // Existing Unsplash logic
     const set = PHOTO_SETS[photoSet];
 
     const hero: MediaItem =
@@ -171,6 +190,7 @@ export default function App() {
     heroRatio,
     secondaryRatio,
     photoSet,
+    localImageItems,
   ]);
 
   const heroOrientation =
@@ -275,6 +295,33 @@ export default function App() {
             Tip: try 375 / 414 / 768 widths
           </div>
         </div>
+
+        {/* Local images status */}
+        {photoSet === "local" && (
+          <div
+            style={{
+              marginBottom: 16,
+              padding: 12,
+              background: localImagesError ? "#fee" : localImagesLoading ? "#fef3c7" : "#e0f2fe",
+              borderRadius: 8,
+              fontSize: 14,
+            }}
+          >
+            {localImagesLoading && "⏳ Loading local images from public/photos..."}
+            {localImagesError && `❌ Error: ${localImagesError}`}
+            {!localImagesLoading && !localImagesError && (
+              <>
+                ✅ Loaded {localImageItems.length} local image{localImageItems.length !== 1 ? "s" : ""} from
+                public/photos
+                {localImageItems.length === 0 && (
+                  <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
+                    Add images to <code>public/photos/</code> folder to use them
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
 
         {/* Post container with adjustable width */}
         <div style={{ width: containerWidth, margin: "0 auto" }}>
