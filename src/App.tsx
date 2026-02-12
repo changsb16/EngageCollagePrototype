@@ -133,8 +133,18 @@ export default function App() {
       if (localImageItems.length === 0) {
         return [];
       }
-      // Return the requested number of images from the local set
-      return localImageItems.slice(0, scenarioCount);
+      // Apply selected aspect ratios to local images for testing
+      return localImageItems.slice(0, scenarioCount).map((item, index) => {
+        // First image uses hero ratio, rest use secondary ratio
+        const isHero = index === 0;
+        const preset = isHero ? heroPreset : secondaryPreset;
+
+        return {
+          ...item,
+          width: preset.w,
+          height: preset.h,
+        };
+      });
     }
 
     // Existing Unsplash logic
